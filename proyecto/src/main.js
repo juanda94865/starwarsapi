@@ -1,24 +1,48 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebaseConfig.js';
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+import mostrarHome from './componentes/home.js';
+import mostrarOriginal from './componentes/original.js';
+import mostrarPerfil from './componentes/perfil.js';
+import mostrarLogout from './componentes/logout.js';
+import mostrarLogin from './componentes/login.js';
+import mostrarRegistro from './componentes/registro.js';
 
-setupCounter(document.querySelector('#counter'))
+function renderMenu(usuario) {
+
+const menu = document.getElementById("menu");
+menu.innerHTML = "";
+
+let botones = [];
+
+if (usuario) {
+botones = [
+{ texto: "Home", fn: mostrarHome },
+{ texto: "Original", fn: mostrarOriginal },
+{ texto: "Perfil", fn: mostrarPerfil },
+{ texto: "Logout", fn: mostrarLogout },
+];
+} else {
+botones = [
+{ texto: "Login", fn: mostrarLogin },
+{ texto: "Registro", fn: mostrarRegistro },
+];
+}
+
+botones.forEach(({ texto, fn }) => {
+const btn = document.createElement("button");
+btn.textContent = texto;
+btn.onclick = fn;
+menu.appendChild(btn);
+});
+}
+
+onAuthStateChanged(auth, (user) => {
+
+renderMenu(user);
+if (user) {
+mostrarHome();
+} else {
+mostrarLogin();
+}
+});
